@@ -18,7 +18,7 @@ function checksExistsUserAccount(request, response, next) {
   }
 
   const userAccount = users.filter(user => user.username === username)
-  
+
   if (!userAccount.length) {
     return response.status(400).json({error: 'User account if not exists'})
   }
@@ -50,7 +50,13 @@ app.post("/users", (request, response) => {
 });
 
 app.get("/todos", checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { userAccount } = request
+
+  const { username } = userAccount
+  
+  const todos = users.filter(user => user.username === username && user.todos)
+
+  return response.json(todos)
 });
 
 app.post("/todos", checksExistsUserAccount, (request, response) => {

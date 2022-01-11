@@ -11,7 +11,21 @@ app.use(express.json());
 const users = [];
 
 function checksExistsUserAccount(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers
+
+  if (!username) {
+    return response.status(400).json({error: 'Username is required on header'})
+  }
+
+  const userAccount = users.filter(user => user.username === username)
+  
+  if (!userAccount.length) {
+    return response.status(400).json({error: 'User account if not exists'})
+  }
+
+  request.userAccount = userAccount
+
+  next()
 }
 
 app.post("/users", (request, response) => {

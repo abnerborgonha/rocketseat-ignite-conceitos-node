@@ -17,13 +17,13 @@ function checksExistsUserAccount(request, response, next) {
     return response.status(400).json({error: 'Username is required on header'})
   }
 
-  const userAccount = users.filter(user => user.username === username)
+  const user = users.find(user => user.username === username)
 
-  if (!userAccount.length) {
+  if (!user) {
     return response.status(400).json({error: 'User account if not exists'})
   }
 
-  request.userAccount = userAccount
+  request.user = user
 
   next()
 }
@@ -50,17 +50,27 @@ app.post("/users", (request, response) => {
 });
 
 app.get("/todos", checksExistsUserAccount, (request, response) => {
-  const { userAccount } = request
+  const { user } = request
 
-  const { username } = userAccount
-  
-  const todos = users.filter(user => user.username === username && user.todos)
-
-  return response.json(todos)
+  return response.json(user.todos)
 });
 
 app.post("/todos", checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request
+  const { title, deadline } = request.body
+
+  const newTodo = {
+    id: uuidv4(),
+    title,
+    deadline: new Date(deadline),
+    done: false,
+    created_at: new Date()
+  }
+  
+  user.todos.push(newTodo)
+
+  return response.status(201).json(newTodo)
+
 });
 
 app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
